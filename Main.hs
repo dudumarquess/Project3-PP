@@ -100,7 +100,9 @@ continuar :: EstadoJogo -> String -> IO ()
 continuar estadoJogo decisao = do
     novoEstado <- ronda estadoJogo (valorAposta decisao)
     if terminado novoEstado
-        then printCartasCredito novoEstado >> sair novoEstado
+        then do
+            printCartasCredito novoEstado
+            sair novoEstado
         else jogo novoEstado
 
 
