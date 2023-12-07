@@ -33,28 +33,27 @@ main = do
     if "-t" `elem` args
         then runTest
         else runGame args
-        
+
 runGame :: [String] -> IO ()
 runGame args = do
     let (filePath, numBaralho) = inicializacao args
     fileExists <- doesFileExist filePath
-    if null filePath && numBaralho == (-1) || not fileExists
-        then modosUtilizacao 
+    if null filePath ||  (not fileExists && filePath /= "-n")
+        then modosUtilizacao
         else do
             baralhoString <- tiposInicializacao (filePath, numBaralho)
             jogo $ inicializa $ converte baralhoString
 
-
 inicializacao :: [String] -> (FilePath, Int)
 inicializacao args = case args of
                 [file] -> (file, 1)
-                ["-n", x] -> ("", read x)
+                ["-n", x] -> ("-n", read x)
                 [] -> ("default.bar", 1)
                 _ -> ("", -1)
 
 tiposInicializacao :: (FilePath, Int) -> IO [String]
-tiposInicializacao (file, numBaralho) 
-    | null file && numBaralho > 0 = baralhoAleatorio numBaralho
+tiposInicializacao (file, numBaralho)
+    | file == "-n" = baralhoAleatorio numBaralho
     | otherwise = lerBaralho file
 
 modosUtilizacao :: IO ()
@@ -85,7 +84,7 @@ jogo :: EstadoJogo -> IO ()
 jogo estadoJogo = do
     printCartasCredito estadoJogo
     decisao <- getLine
-    if decisao == "sair" 
+    if decisao == "sair"
         then sair estadoJogo
         else do
             novoEstado <- ronda estadoJogo (valorAposta decisao)
@@ -94,7 +93,7 @@ jogo estadoJogo = do
                     printCartasCredito novoEstado
                     sair novoEstado
                 else jogo novoEstado
-            
+
 
 
 ronda :: EstadoJogo -> Int -> IO EstadoJogo
