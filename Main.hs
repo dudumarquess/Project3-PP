@@ -86,15 +86,23 @@ jogo :: EstadoJogo -> IO ()
 jogo estadoJogo = do
     printCartasCredito estadoJogo
     decisao <- getLine
-    if decisao == "sair"
-        then sair estadoJogo
-        else do
-            novoEstado <- ronda estadoJogo (valorAposta decisao)
-            if terminado novoEstado
-                then do
-                    printCartasCredito novoEstado
-                    sair novoEstado
-                else jogo novoEstado
+    verificarDecisao estadoJogo decisao
+
+verificarDecisao :: EstadoJogo -> String -> IO ()
+verificarDecisao estadoJogo decisao
+    | decisao == "sair" = sair estadoJogo
+    | valorAposta decisao > creditos estadoJogo = do
+        erro estadoJogo
+        jogo estadoJogo
+    | otherwise = continuar estadoJogo decisao
+
+continuar :: EstadoJogo -> String -> IO ()
+continuar estadoJogo decisao = do
+    novoEstado <- ronda estadoJogo (valorAposta decisao)
+    if terminado novoEstado
+        then printCartasCredito novoEstado >> sair novoEstado
+        else jogo novoEstado
+
 
 ronda :: EstadoJogo -> Int -> IO EstadoJogo
 ronda = primeiraFase
@@ -134,6 +142,10 @@ printResultado valor estadoFinal resultado
     | creditos estadoFinal + valor == creditos resultado = putStrLn "Empate"
     | creditos estadoFinal + (2 * valor) == creditos resultado = putStrLn "Vitoria"
     | otherwise = putStrLn "Derrota"
+
+erro :: EstadoJogo -> IO ()
+erro estadoJogo = do
+    putStrLn "O valor da aposta não é valido, insira novamente"
 
 sair :: EstadoJogo -> IO ()
 sair estadoJogo = putStrLn ("saldo final: " ++ show (creditos estadoJogo))
