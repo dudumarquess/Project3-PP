@@ -19,6 +19,8 @@ através de um dos seguintes quatro tipos de instruções:
 > ./Main -t       -- corre os testes
 -}
 
+-- fc59798,fc59821
+
 import Test.QuickCheck
 import System.Environment
 import System.Random
