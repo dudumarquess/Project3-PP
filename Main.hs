@@ -94,8 +94,6 @@ jogo estadoJogo = do
                     sair novoEstado
                 else jogo novoEstado
 
-
-
 ronda :: EstadoJogo -> Int -> IO EstadoJogo
 ronda = primeiraFase
 
@@ -108,7 +106,10 @@ segundaFase estadoJogo valor
         printCartasJogo estadoJogo
         terceiraFase estadoJogo valor
     | pontos (jogador estadoJogo) > 21 = derrota estadoJogo valor
-    | otherwise = do
+    | otherwise = hitStand estadoJogo valor
+
+hitStand :: EstadoJogo -> Int -> IO EstadoJogo
+hitStand estadoJogo valor = do
         printCartasJogo estadoJogo
         decisao <- getLine
         if decisao == "hit"
